@@ -1,5 +1,7 @@
 var formE1 = document.querySelector("#task-form");
 var tasksToDoE1 = document.querySelector("#tasks-to-do");
+var taskIdCounter = 0;
+var pageContentE1 = document.querySelector("#page-content");
 
 
 
@@ -35,6 +37,9 @@ var createTaskE1 = function(taskDataObj) {
    var listItemE1 = document.createElement("li");
    listItemE1.className = "task-item";
 
+   // add task id as a custom attribute
+   listItemE1.setAttribute("data-task-id", taskIdCounter);
+
    // create div to hold task info and to add to list item
    var taskInfoE1 = document.createElement("div");
    // give it a class name
@@ -44,8 +49,73 @@ var createTaskE1 = function(taskDataObj) {
 
    listItemE1.appendChild(taskInfoE1);
 
+   var taskActionsE1 = createTaskActions(taskIdCounter);
+   listItemE1.appendChild(taskActionsE1);
+
    // add entire list item to list
    tasksToDoE1.appendChild(listItemE1);
+
+   taskIdCounter++;
+};
+
+var createTaskActions = function(taskID) {
+   // create div container for all the buttons
+   var actionContainerE1 = document.createElement("div");
+   actionContainerE1.className = "task-actions";
+
+   // create edit button
+   var editButtonE1 = document.createElement("button");
+   editButtonE1.textContent = "Edit";
+   editButtonE1.className = "btn edit-btn";
+   editButtonE1.setAttribute("data-task-id", taskID);
+
+   actionContainerE1.appendChild(editButtonE1);
+
+   // create delete button
+   var deleteButtonE1 = document.createElement("button");
+   deleteButtonE1.textContent = "Delete";
+   deleteButtonE1.className = "btn delete-btn";
+   deleteButtonE1.setAttribute("data-task-id", taskID);
+
+   actionContainerE1.appendChild(deleteButtonE1);
+
+   // create dropdown list
+   var statusSelectE1 = document.createElement("select");
+   statusSelectE1.className = "select-status";
+   statusSelectE1.setAttribute("name", "status-change");
+   statusSelectE1.setAttribute("data-task-id", taskID);
+
+   var statusChoices = ["To Do", "In Progress", "Completed"];
+
+   for (var i = 0; i < statusChoices.length; i++) {
+      // create option element
+      var statusOptionE1 = document.createElement("option");
+      statusOptionE1.textContent = statusChoices[i];
+      statusOptionE1.setAttribute("value", statusChoices[i]);
+
+      // append to select
+      statusSelectE1.appendChild(statusOptionE1);
+   }
+
+   actionContainerE1.appendChild(statusSelectE1);
+
+   return actionContainerE1;
 }
 
+var taskButtonHandler = function(event) {
+   console.log(event.target);
+
+   if (event.target.matches(".delete-btn")) {
+      // get the element's task id
+      var taskId = event.target.getAttribute("data-task-id");
+      deleteTask(taskId);
+   }
+};
+
+var deleteTask = function(taskId) {
+   var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+   taskSelected.remove();
+};
+
 formE1.addEventListener("submit", taskFormHandler);
+pageContentE1.addEventListener("click", taskButtonHandler);
