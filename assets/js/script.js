@@ -268,6 +268,15 @@ var dropTaskHandler = function(event) {
    dropZoneE1.removeAttribute("style");
 
    dropZoneE1.appendChild(draggableElement);
+
+   // loop through tasks array to find and update the updated task's status
+   for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].id === parseInt(id)) {
+         tasks[i].status = statusSelectE1.value.toLowerCase();
+      }
+   }
+
+   console.log(tasks);
 }
 
 var dragLeaveHandler = function(event) {
