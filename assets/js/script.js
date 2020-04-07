@@ -67,6 +67,7 @@ var createTaskE1 = function(taskDataObj) {
    taskDataObj.id = taskIdCounter;
 
    tasks.push(taskDataObj);
+   saveTasks();
 
    var taskActionsE1 = createTaskActions(taskIdCounter);
    listItemE1.appendChild(taskActionsE1);
@@ -156,6 +157,7 @@ var deleteTask = function(taskId) {
 
    // reassign tasks array to be the same as updatedTaskArr
    tasks = updatedTaskArr
+   saveTasks();
 };
 
 var editTask = function(taskId) {
@@ -195,6 +197,7 @@ var completeEditTask = function(taskName, taskType, taskId) {
    }
 
    alert("Task Updated!");
+   saveTasks();
 
    formE1.removeAttribute("data-task-id");
    document.querySelector("#save-task").textContent = "Add Task";
@@ -226,6 +229,7 @@ var taskStatusChangeHandler = function(event) {
          tasks[i].status = statusValue;
       }
    }
+   saveTasks();
 };
 
 var dragTaskHandler = function(event) {
@@ -268,6 +272,15 @@ var dropTaskHandler = function(event) {
    dropZoneE1.removeAttribute("style");
 
    dropZoneE1.appendChild(draggableElement);
+
+   // loop through tasks array to find and update the updated task's status
+   for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].id === parseInt(id)) {
+         tasks[i].status = statusSelectE1.value.toLowerCase();
+      }
+   }
+
+   saveTasks();
 }
 
 var dragLeaveHandler = function(event) {
@@ -278,8 +291,29 @@ var dragLeaveHandler = function(event) {
 }
 
 var saveTasks = function() {
-   localStorage.setItem("tasks", tasks);
+   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
+
+var loadTasks = function() {
+   // Get tasks from localStorage
+   var savedTasks = localStorage.getItem("tasks");
+
+   // Convert task from stringified format back into an array of objects
+   if (!savedTasks) {
+      return false;
+   }
+
+   // Iterate through tasks array and create task elements on the page from it
+   savedTasks = JSON.parse(savedTasks);
+
+   // loop through savedTasks array
+   for (var i = 0; i < savedTasks.length; i++) {
+      // pass each task object into the 'createTaskE1()' function
+      createTaskE1(savedTasks[i]);
+   }
+}
+
+loadTasks();
 
 formE1.addEventListener("submit", taskFormHandler);
 pageContentE1.addEventListener("click", taskButtonHandler);
